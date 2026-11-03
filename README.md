@@ -420,8 +420,7 @@ passwords or hashes before publishing it.
 ---
 
  ## License
- 
- MIT © 2026
+MIT © 2026
 
 ---
 
