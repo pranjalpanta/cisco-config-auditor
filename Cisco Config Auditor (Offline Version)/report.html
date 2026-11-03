@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cisco IOS Configuration Audit</title>
+<style>
+:root{
+  --bg:#f4f6f8; --card:#ffffff; --ink:#1f2937; --muted:#6b7280;
+  --line:#e2e8f0; --high:#b91c1c; --medium:#b45309; --low:#1d4ed8;
+  --pass:#0f766e; --fail:#b91c1c; --skip:#6b7280;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:28px;background:var(--bg);color:var(--ink);
+     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+     line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto}
+h1{font-size:26px;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 22px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+      padding:18px 20px;margin-bottom:22px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+td.num{text-align:center}
+.score{font-weight:700}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700}
+.pill.good{background:#d1fae5;color:#065f46}
+.pill.ok{background:#fef3c7;color:#92400e}
+.pill.bad{background:#fee2e2;color:#991b1b}
+.bar{height:7px;background:#e5e7eb;border-radius:4px;overflow:hidden;margin-top:4px;min-width:90px}
+.bar span{display:block;height:100%;background:#0f766e}
+.device-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.device-head h2{font-size:19px;margin:0}
+.meta{color:var(--muted);font-size:13px;margin:8px 0 14px}
+h3{font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:22px 0 10px}
+.finding{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.finding.fail{border-left:4px solid var(--fail)}
+.finding.pass{border-left:4px solid var(--pass)}
+.finding.skip{border-left:4px solid var(--skip);opacity:.75}
+.finding-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.finding-head .title{font-weight:600}
+.cid{font-size:12px;color:var(--muted);background:#f1f5f9;padding:1px 6px;border-radius:4px}
+.sev{font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;color:#fff}
+.sev.high{background:var(--high)} .sev.medium{background:var(--medium)} .sev.low{background:var(--low)}
+.result{margin-left:auto;font-size:12px;font-weight:700}
+.result.pass{color:var(--pass)} .result.fail{color:var(--fail)} .result.skip{color:var(--skip)}
+.detail{font-size:13.5px;margin:7px 0 0}
+.why{font-size:13.5px;color:#374151;margin:6px 0 0}
+.fix-title{display:block;font-size:12px;font-weight:700;text-transform:uppercase;
+           letter-spacing:.04em;color:var(--muted);margin:10px 0 5px}
+pre{background:#0f172a;color:#e2e8f0;padding:12px 14px;border-radius:6px;
+    overflow-x:auto;font-size:12.5px;line-height:1.45;margin:0}
+code{font-family:Consolas,"SF Mono",Menlo,monospace}
+.pass .detail{color:var(--muted)}
+details summary{cursor:pointer;font-size:13px;font-weight:600;color:#374151}
+details pre{margin-top:10px;max-height:520px;overflow:auto}
+.legend{font-size:12.5px;color:var(--muted)}
+footer{color:var(--muted);font-size:12.5px;text-align:center;margin:26px 0 6px}
+@media print{body{padding:0;background:#fff}.card{box-shadow:none;break-inside:avoid}}
+</style>
+</head><body><div class="wrap">
+<h1>Cisco IOS Configuration Audit</h1>
+<p class="sub">Source <code>sample_configs</code> &middot; 4 device(s) &middot; average score 51.6% &middot; generated 2026-11-03 18:36</p>
+<div class="card"><h2 style="font-size:16px;margin:0 0 10px">Summary</h2>
+<table><thead><tr><th>Device</th><th>Score</th><th>Grade</th><th class="num">High</th><th class="num">Medium</th><th class="num">Low</th></tr></thead><tbody>
+<tr><td>router_bad.cfg</td><td><div class="score">1.7%</div><div class="bar"><span style="width:1.7%"></span></div></td><td><span class="pill bad">Critical</span></td><td class="num">5</td><td class="num">10</td><td class="num">8</td></tr>
+<tr><td>router_good.cfg</td><td><div class="score">100.0%</div><div class="bar"><span style="width:100.0%"></span></div></td><td><span class="pill good">Good</span></td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>switch_bad.cfg</td><td><div class="score">4.9%</div><div class="bar"><span style="width:4.9%"></span></div></td><td><span class="pill bad">Critical</span></td><td class="num">9</td><td class="num">13</td><td class="num">9</td></tr>
+<tr><td>switch_good.cfg</td><td><div class="score">100.0%</div><div class="bar"><span style="width:100.0%"></span></div></td><td><span class="pill good">Good</span></td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+</tbody></table>
+<p class="legend">Score = earned points / possible points. A high finding costs 10 points, medium 5, low 2. Checks that do not apply (for example Layer 2 checks on a router) are skipped and not counted.</p>
+</div>
+<div class="card"><div class="device-head"><h2>router_bad.cfg</h2><span class="pill bad">1.7% &middot; Critical</span></div><p class="meta">File: <code>sample_configs\router_bad.cfg</code> &middot; 1 passed, 23 failed, 10 skipped &middot; score 2/118 points</p><details><summary>Show the analyzed configuration</summary><pre><code>!
+! router_bad.cfg
+! A deliberately insecure Cisco IOS router config.
+! It is here so the auditor has something to find.
+!
+hostname Router-Bad
+!
+enable password cisco
+!
+no service password-encryption
+service timestamps log datetime msec localtime
+service tcp-small-servers
+service udp-small-servers
+ip finger
+ip http server
+ip source-route
+!
+snmp-server community public RW
+snmp-server community private RO
+snmp-server location Unknown
+!
+logging buffered 4096
+!
+interface GigabitEthernet0/0
+ description WAN-LINK
+ ip address 203.0.113.2 255.255.255.252
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description LAN-LINK
+ ip address 192.0.2.1 255.255.255.0
+ no shutdown
+!
+line con 0
+ password cisco
+ login
+!
+line vty 0 4
+ transport input telnet
+ password cisco
+ login
+!
+end
+</code></pre></details><h3>Management plane</h3><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">MGMT-01</code><span class="title">Enable secret is configured</span><span class="result fail">FAIL</span></div><p class="detail">Only &#x27;enable password&#x27; is set. It is weak and easy to reverse.</p><p class="why">The enable secret protects privileged mode. &#x27;enable password&#x27; is stored weakly and can be reversed, so reading the config gives full control.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>enable secret 9 &lt;STRONG-HASH&gt;
+! Create the hash on the device with:
+!   enable algorithm-type scrypt secret YourStrongPassword</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">MGMT-02</code><span class="title">SSHv2 only, Telnet disabled</span><span class="result fail">FAIL</span></div><p class="detail">line vty 0 4 allows telnet or all protocols; &#x27;ip ssh version 2&#x27; is missing</p><p class="why">Telnet sends every keystroke and password in clear text. SSH encrypts the session, and SSHv2 fixes weaknesses found in SSHv1.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>ip ssh version 2
+line vty 0 15
+ transport input ssh</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-03</code><span class="title">VTY lines have an idle timeout</span><span class="result fail">FAIL</span></div><p class="detail">Idle sessions are not timed out: line vty 0 4 (no exec-timeout)</p><p class="why">An idle VTY session left open gives the next person full access. A 5-15 minute timeout limits that window.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>line vty 0 15
+ exec-timeout 10 0</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">MGMT-04</code><span class="title">Console line has an idle timeout</span><span class="result fail">FAIL</span></div><p class="detail">The console line has no idle timeout.</p><p class="why">The console is powerful local access. A timeout stops a forgotten session from staying logged in.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>line con 0
+ exec-timeout 10 0</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">MGMT-05</code><span class="title">Login banner is configured</span><span class="result fail">FAIL</span></div><p class="detail">No login banner. Users are not warned that access is monitored.</p><p class="why">A banner warns users that only authorised access is allowed and that activity is monitored. Some countries also require a warning banner.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>banner motd ^C
+Authorised access only. All activity is monitored and logged.
+^C</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-06</code><span class="title">AAA authentication is enabled</span><span class="result fail">FAIL</span></div><p class="detail">AAA is not enabled, so there is no central login policy.</p><p class="why">AAA lets you use central RADIUS/TACACS+ accounts and accounting. Without it every device has separate local passwords.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>aaa new-model
+aaa authentication login default group tacacs+ local
+aaa authorization exec default group tacacs+ local
+aaa accounting exec default start-stop group tacacs+</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-07</code><span class="title">Named admin account uses a secret</span><span class="result fail">FAIL</span></div><p class="detail">No named admin account with a secret is configured.</p><p class="why">Named accounts give each admin their own login so actions can be traced. &#x27;secret&#x27; stores a hash; &#x27;password&#x27; does not.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>username admin privilege 15 secret 9 &lt;STRONG-HASH&gt;</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-08</code><span class="title">Service password-encryption is enabled</span><span class="result fail">FAIL</span></div><p class="detail">service password-encryption is disabled, so some passwords may be plain text.</p><p class="why">Some older commands store passwords in clear text. This service hides them with a weak (type 7) but better-than-nothing cipher.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>service password-encryption</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-09</code><span class="title">VTY access is restricted by an ACL</span><span class="result fail">FAIL</span></div><p class="detail">No inbound ACL on: line vty 0 4</p><p class="why">If anyone on the network can reach the VTY lines, they can try passwords. An ACL limits management to trusted admin subnets.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>ip access-list standard MGMT-ACCESS
+ permit 192.0.2.0 0.0.0.255
+line vty 0 15
+ access-class MGMT-ACCESS in</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">MGMT-10</code><span class="title">SSH timeouts and retries are limited</span><span class="result fail">FAIL</span></div><p class="detail">SSH time-out or authentication-retries (&lt;= 3) is not configured.</p><p class="why">Limiting SSH retries and idle time slows down password guessing and frees abandoned sessions.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>ip ssh time-out 60
+ip ssh authentication-retries 3</code></pre></div></article><h3>SNMP</h3><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">SNMP-01</code><span class="title">No default SNMP community strings</span><span class="result fail">FAIL</span></div><p class="detail">Default community string(s) in use: private, public</p><p class="why">public/private are the default community strings and the first thing an attacker tries. SNMPv1/v2c sends them in clear text.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no snmp-server community public RO
+no snmp-server community private RW
+! Then configure SNMPv3 (see SNMP-02)</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">SNMP-02</code><span class="title">SNMPv3 is used (or SNMP is off)</span><span class="result fail">FAIL</span></div><p class="detail">SNMPv1/v2c community strings are used instead of SNMPv3.</p><p class="why">SNMPv3 adds authentication and encryption. SNMPv1/v2c community strings work like plain-text passwords.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>snmp-server group AUDIT v3 priv
+snmp-server user audit AUDIT v3 auth sha &lt;AUTH-PASSWORD&gt; priv aes 128 &lt;PRIV-PASSWORD&gt;</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">SNMP-03</code><span class="title">No read-write SNMP community</span><span class="result fail">FAIL</span></div><p class="detail">Read-write community string(s): public</p><p class="why">A read-write community string lets an attacker change device settings, not just read them.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no snmp-server community &lt;NAME&gt; RW</code></pre></div></article><h3>Services</h3><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">SVC-01</code><span class="title">Plain HTTP server is disabled</span><span class="result fail">FAIL</span></div><p class="detail">The plain HTTP server is enabled (unencrypted management).</p><p class="why">The HTTP server offers an unencrypted management page and has had many vulnerabilities. Disable it unless it is really needed.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no ip http server
+no ip http secure-server</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">SVC-02</code><span class="title">CDP is disabled</span><span class="result fail">FAIL</span></div><p class="detail">CDP is enabled and advertises device details to neighbours.</p><p class="why">CDP tells neighbours the device model, IOS version and management address - useful reconnaissance for an attacker.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no cdp run
+! or per interface:
+interface GigabitEthernet0/1
+ no cdp enable</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">SVC-03</code><span class="title">TCP/UDP small servers are disabled</span><span class="result fail">FAIL</span></div><p class="detail">Small servers are not explicitly disabled: no service tcp-small-servers, no service udp-small-servers</p><p class="why">The small servers (echo, chargen, discard) are old debugging tools. They are rarely needed and can be abused for amplification attacks.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no service tcp-small-servers
+no service udp-small-servers</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">SVC-04</code><span class="title">IP source routing is disabled</span><span class="result fail">FAIL</span></div><p class="detail">IP source routing is enabled, which attackers can abuse.</p><p class="why">Source routing lets the sender choose the path a packet takes. Attackers use it to bypass filters.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no ip source-route</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">SVC-05</code><span class="title">Directed broadcasts are disabled</span><span class="result fail">FAIL</span></div><p class="detail">Directed broadcasts not disabled on: interface GigabitEthernet0/0, interface GigabitEthernet0/1</p><p class="why">A directed broadcast can be amplified into a flood against another network (Smurf-style attack).</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>interface GigabitEthernet0/0
+ no ip directed-broadcast</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">SVC-06</code><span class="title">Finger and BOOTP server are disabled</span><span class="result fail">FAIL</span></div><p class="detail">Not disabled: no ip finger, no ip bootp server</p><p class="why">finger reveals who is logged in, and the BOOTP server can be tricked into serving configurations. Neither is normally needed.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no ip finger
+no ip bootp server</code></pre></div></article><h3>Logging &amp; NTP</h3><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">LOG-01</code><span class="title">Remote syslog server is configured</span><span class="result fail">FAIL</span></div><p class="detail">No remote syslog server. Logs are lost when the device reboots.</p><p class="why">Local logs disappear on reload and are easy to erase. A remote syslog server keeps evidence and helps with troubleshooting.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>logging host 192.0.2.50
+logging source-interface GigabitEthernet0/0</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">LOG-03</code><span class="title">Syslog trap level is set</span><span class="result fail">FAIL</span></div><p class="detail">&#x27;logging trap&#x27; is missing, so the default level may be too quiet.</p><p class="why">If the trap level is not set, important messages may never be sent to the syslog server.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>logging trap informational</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">NTP-01</code><span class="title">NTP server is configured</span><span class="result fail">FAIL</span></div><p class="detail">No NTP server. Timestamps in logs and certificates will drift.</p><p class="why">Accurate time is essential for log correlation, certificate checks and incident response.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>ntp server 192.0.2.10</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">NTP-02</code><span class="title">NTP authentication is enabled</span><span class="result fail">FAIL</span></div><p class="detail">NTP authentication is incomplete: ntp authenticate, ntp authentication-key, ntp trusted-key</p><p class="why">Without authentication an attacker can feed the device a false time and confuse logs or certificate checks.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>ntp authenticate
+ntp authentication-key 1 md5 &lt;NTP-KEY&gt;
+ntp trusted-key 1
+ntp server 192.0.2.10 key 1</code></pre></div></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">LOG-02</code><span class="title">Buffered logging with timestamps</span><span class="result pass">PASS</span></div><p class="detail">Logs are buffered locally and carry a real date/time.</p></article><h3>Layer 2 security</h3><article class="finding skip"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-01</code><span class="title">Port security on access ports</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-02</code><span class="title">Port security limits and violation mode</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-03</code><span class="title">Trunk native VLAN is not VLAN 1</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-04</code><span class="title">Unused ports are shut down</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-05</code><span class="title">DHCP snooping is enabled</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-06</code><span class="title">Dynamic ARP Inspection is enabled</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-07</code><span class="title">BPDU Guard is enabled</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">L2-08</code><span class="title">PortFast is enabled on access ports</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-09</code><span class="title">Management SVI is not on VLAN 1</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">L2-10</code><span class="title">Trunk allowed VLAN list is restricted</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article></div>
+<div class="card"><div class="device-head"><h2>router_good.cfg</h2><span class="pill good">100.0% &middot; Good</span></div><p class="meta">File: <code>sample_configs\router_good.cfg</code> &middot; 24 passed, 0 failed, 10 skipped &middot; score 118/118 points</p><details><summary>Show the analyzed configuration</summary><pre><code>!
+! router_good.cfg
+! A deliberately well-hardened Cisco IOS router config used by the auditor
+! demo. All addresses and hashes are fake examples.
+!
+hostname Router-Good
+!
+banner motd ^C
+**************************************************************
+*  Authorised access only. All activity is monitored/logged. *
+**************************************************************
+^C
+!
+service password-encryption
+service timestamps debug datetime msec localtime
+service timestamps log datetime msec localtime
+no service tcp-small-servers
+no service udp-small-servers
+!
+aaa new-model
+aaa authentication login default group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+aaa authorization exec default group tacacs+ local
+aaa accounting exec default start-stop group tacacs+
+!
+enable secret 9 $9$EXAMPLEHASHONLY$DoNotUseThisHash
+!
+username admin privilege 15 secret 9 $9$EXAMPLEHASHONLY$AdminHash
+!
+ip ssh version 2
+ip ssh time-out 60
+ip ssh authentication-retries 3
+no ip http server
+no ip http secure-server
+no ip source-route
+no ip finger
+no ip bootp server
+no cdp run
+!
+ip access-list standard MGMT-ACCESS
+ permit 192.0.2.0 0.0.0.255
+!
+snmp-server group AUDIT v3 priv
+snmp-server user audit AUDIT v3 auth sha AuthPass123 priv aes 128 PrivPass123
+snmp-server location DC1-Rack12
+snmp-server contact noc@example.com
+!
+logging host 192.0.2.50
+logging source-interface GigabitEthernet0/0
+logging buffered 16384 informational
+logging trap informational
+!
+ntp authenticate
+ntp authentication-key 1 md5 NtpKey123
+ntp trusted-key 1
+ntp server 192.0.2.10 key 1
+!
+interface GigabitEthernet0/0
+ description WAN-LINK
+ ip address 203.0.113.2 255.255.255.252
+ no ip directed-broadcast
+ no ip proxy-arp
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description LAN-LINK
+ ip address 192.0.2.1 255.255.255.0
+ no ip directed-broadcast
+ no ip proxy-arp
+ no shutdown
+!
+line con 0
+ exec-timeout 10 0
+ logging synchronous
+ login local
+!
+line vty 0 4
+ access-class MGMT-ACCESS in
+ exec-timeout 10 0
+ logging synchronous
+ login local
+ transport input ssh
+!
+line vty 5 15
+ access-class MGMT-ACCESS in
+ exec-timeout 10 0
+ logging synchronous
+ login local
+ transport input ssh
+!
+end
+</code></pre></details><h3>Management plane</h3><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">MGMT-01</code><span class="title">Enable secret is configured</span><span class="result pass">PASS</span></div><p class="detail">A hashed enable secret is configured.</p></article><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">MGMT-02</code><span class="title">SSHv2 only, Telnet disabled</span><span class="result pass">PASS</span></div><p class="detail">VTY lines accept SSH only, and SSH version 2 is forced.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-03</code><span class="title">VTY lines have an idle timeout</span><span class="result pass">PASS</span></div><p class="detail">Every VTY line logs out idle sessions.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">MGMT-04</code><span class="title">Console line has an idle timeout</span><span class="result pass">PASS</span></div><p class="detail">The console line logs out idle sessions.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">MGMT-05</code><span class="title">Login banner is configured</span><span class="result pass">PASS</span></div><p class="detail">A login banner is configured.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-06</code><span class="title">AAA authentication is enabled</span><span class="result pass">PASS</span></div><p class="detail">AAA new-model and a default login method are configured.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-07</code><span class="title">Named admin account uses a secret</span><span class="result pass">PASS</span></div><p class="detail">A named admin account uses a hashed secret.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-08</code><span class="title">Service password-encryption is enabled</span><span class="result pass">PASS</span></div><p class="detail">service password-encryption is enabled.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-09</code><span class="title">VTY access is restricted by an ACL</span><span class="result pass">PASS</span></div><p class="detail">VTY lines are restricted by an inbound access-class.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">MGMT-10</code><span class="title">SSH timeouts and retries are limited</span><span class="result pass">PASS</span></div><p class="detail">SSH has a timeout and at most three authentication retries.</p></article><h3>SNMP</h3><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">SNMP-01</code><span class="title">No default SNMP community strings</span><span class="result pass">PASS</span></div><p class="detail">No default SNMP community strings are used.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">SNMP-02</code><span class="title">SNMPv3 is used (or SNMP is off)</span><span class="result pass">PASS</span></div><p class="detail">SNMPv3 group and user are configured.</p></article><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">SNMP-03</code><span class="title">No read-write SNMP community</span><span class="result pass">PASS</span></div><p class="detail">No read-write SNMP community string is configured.</p></article><h3>Services</h3><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">SVC-01</code><span class="title">Plain HTTP server is disabled</span><span class="result pass">PASS</span></div><p class="detail">The plain HTTP server is disabled.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">SVC-02</code><span class="title">CDP is disabled</span><span class="result pass">PASS</span></div><p class="detail">CDP is disabled globally.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">SVC-03</code><span class="title">TCP/UDP small servers are disabled</span><span class="result pass">PASS</span></div><p class="detail">TCP and UDP small servers are disabled.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">SVC-04</code><span class="title">IP source routing is disabled</span><span class="result pass">PASS</span></div><p class="detail">IP source routing is disabled.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">SVC-05</code><span class="title">Directed broadcasts are disabled</span><span class="result pass">PASS</span></div><p class="detail">Directed broadcasts are disabled on all Layer 3 interfaces.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">SVC-06</code><span class="title">Finger and BOOTP server are disabled</span><span class="result pass">PASS</span></div><p class="detail">The finger service and the BOOTP server are disabled.</p></article><h3>Logging &amp; NTP</h3><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">LOG-01</code><span class="title">Remote syslog server is configured</span><span class="result pass">PASS</span></div><p class="detail">Logs are sent to a remote syslog server.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">LOG-02</code><span class="title">Buffered logging with timestamps</span><span class="result pass">PASS</span></div><p class="detail">Logs are buffered locally and carry a real date/time.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">LOG-03</code><span class="title">Syslog trap level is set</span><span class="result pass">PASS</span></div><p class="detail">The syslog severity level is set explicitly.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">NTP-01</code><span class="title">NTP server is configured</span><span class="result pass">PASS</span></div><p class="detail">At least one NTP server is configured.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">NTP-02</code><span class="title">NTP authentication is enabled</span><span class="result pass">PASS</span></div><p class="detail">NTP authentication is enabled with a trusted key.</p></article><h3>Layer 2 security</h3><article class="finding skip"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-01</code><span class="title">Port security on access ports</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-02</code><span class="title">Port security limits and violation mode</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-03</code><span class="title">Trunk native VLAN is not VLAN 1</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-04</code><span class="title">Unused ports are shut down</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-05</code><span class="title">DHCP snooping is enabled</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-06</code><span class="title">Dynamic ARP Inspection is enabled</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-07</code><span class="title">BPDU Guard is enabled</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">L2-08</code><span class="title">PortFast is enabled on access ports</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-09</code><span class="title">Management SVI is not on VLAN 1</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article><article class="finding skip"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">L2-10</code><span class="title">Trunk allowed VLAN list is restricted</span><span class="result skip">SKIP</span></div><p class="detail">Not a switch config (no switchport commands).</p></article></div>
+<div class="card"><div class="device-head"><h2>switch_bad.cfg</h2><span class="pill bad">4.9% &middot; Critical</span></div><p class="meta">File: <code>sample_configs\switch_bad.cfg</code> &middot; 3 passed, 31 failed, 0 skipped &middot; score 9/182 points</p><details><summary>Show the analyzed configuration</summary><pre><code>!
+! switch_bad.cfg
+! A deliberately insecure Cisco IOS switch config.
+! Layer 2 is wide open: no port security, VLAN 1 native, unused ports up,
+! no DHCP snooping, no Dynamic ARP Inspection and no BPDU Guard.
+!
+hostname Switch-Bad
+!
+service password-encryption
+service timestamps log datetime msec localtime
+ip http server
+snmp-server community public RW
+!
+logging buffered 4096
+!
+interface Vlan1
+ description MANAGEMENT
+ ip address 192.0.2.10 255.255.255.0
+ no ip directed-broadcast
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description TRUNK-TO-CORE
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/1
+ description USER-PORT
+ switchport mode access
+ switchport access vlan 10
+ no shutdown
+!
+interface FastEthernet0/2
+ description USER-PORT
+ switchport mode access
+ switchport access vlan 10
+ no shutdown
+!
+interface FastEthernet0/3
+ description USER-PORT
+ switchport mode access
+ switchport access vlan 10
+ no shutdown
+!
+interface FastEthernet0/10
+ description UNUSED - patch panel
+ switchport mode access
+ switchport access vlan 10
+ no shutdown
+!
+interface FastEthernet0/11
+ description UNUSED - patch panel
+ switchport mode access
+ switchport access vlan 10
+ no shutdown
+!
+interface FastEthernet0/12
+ description SPARE - meeting room
+ switchport mode access
+ switchport access vlan 10
+ no shutdown
+!
+line con 0
+ password cisco
+ login
+!
+line vty 0 4
+ transport input telnet
+ password cisco
+ login
+!
+end
+</code></pre></details><h3>Management plane</h3><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">MGMT-01</code><span class="title">Enable secret is configured</span><span class="result fail">FAIL</span></div><p class="detail">No enable secret. Anyone who reaches privileged mode is unprotected.</p><p class="why">The enable secret protects privileged mode. &#x27;enable password&#x27; is stored weakly and can be reversed, so reading the config gives full control.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>enable secret 9 &lt;STRONG-HASH&gt;
+! Create the hash on the device with:
+!   enable algorithm-type scrypt secret YourStrongPassword</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">MGMT-02</code><span class="title">SSHv2 only, Telnet disabled</span><span class="result fail">FAIL</span></div><p class="detail">line vty 0 4 allows telnet or all protocols; &#x27;ip ssh version 2&#x27; is missing</p><p class="why">Telnet sends every keystroke and password in clear text. SSH encrypts the session, and SSHv2 fixes weaknesses found in SSHv1.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>ip ssh version 2
+line vty 0 15
+ transport input ssh</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-03</code><span class="title">VTY lines have an idle timeout</span><span class="result fail">FAIL</span></div><p class="detail">Idle sessions are not timed out: line vty 0 4 (no exec-timeout)</p><p class="why">An idle VTY session left open gives the next person full access. A 5-15 minute timeout limits that window.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>line vty 0 15
+ exec-timeout 10 0</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">MGMT-04</code><span class="title">Console line has an idle timeout</span><span class="result fail">FAIL</span></div><p class="detail">The console line has no idle timeout.</p><p class="why">The console is powerful local access. A timeout stops a forgotten session from staying logged in.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>line con 0
+ exec-timeout 10 0</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">MGMT-05</code><span class="title">Login banner is configured</span><span class="result fail">FAIL</span></div><p class="detail">No login banner. Users are not warned that access is monitored.</p><p class="why">A banner warns users that only authorised access is allowed and that activity is monitored. Some countries also require a warning banner.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>banner motd ^C
+Authorised access only. All activity is monitored and logged.
+^C</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-06</code><span class="title">AAA authentication is enabled</span><span class="result fail">FAIL</span></div><p class="detail">AAA is not enabled, so there is no central login policy.</p><p class="why">AAA lets you use central RADIUS/TACACS+ accounts and accounting. Without it every device has separate local passwords.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>aaa new-model
+aaa authentication login default group tacacs+ local
+aaa authorization exec default group tacacs+ local
+aaa accounting exec default start-stop group tacacs+</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-07</code><span class="title">Named admin account uses a secret</span><span class="result fail">FAIL</span></div><p class="detail">No named admin account with a secret is configured.</p><p class="why">Named accounts give each admin their own login so actions can be traced. &#x27;secret&#x27; stores a hash; &#x27;password&#x27; does not.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>username admin privilege 15 secret 9 &lt;STRONG-HASH&gt;</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-09</code><span class="title">VTY access is restricted by an ACL</span><span class="result fail">FAIL</span></div><p class="detail">No inbound ACL on: line vty 0 4</p><p class="why">If anyone on the network can reach the VTY lines, they can try passwords. An ACL limits management to trusted admin subnets.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>ip access-list standard MGMT-ACCESS
+ permit 192.0.2.0 0.0.0.255
+line vty 0 15
+ access-class MGMT-ACCESS in</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">MGMT-10</code><span class="title">SSH timeouts and retries are limited</span><span class="result fail">FAIL</span></div><p class="detail">SSH time-out or authentication-retries (&lt;= 3) is not configured.</p><p class="why">Limiting SSH retries and idle time slows down password guessing and frees abandoned sessions.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>ip ssh time-out 60
+ip ssh authentication-retries 3</code></pre></div></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-08</code><span class="title">Service password-encryption is enabled</span><span class="result pass">PASS</span></div><p class="detail">service password-encryption is enabled.</p></article><h3>SNMP</h3><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">SNMP-01</code><span class="title">No default SNMP community strings</span><span class="result fail">FAIL</span></div><p class="detail">Default community string(s) in use: public</p><p class="why">public/private are the default community strings and the first thing an attacker tries. SNMPv1/v2c sends them in clear text.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no snmp-server community public RO
+no snmp-server community private RW
+! Then configure SNMPv3 (see SNMP-02)</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">SNMP-02</code><span class="title">SNMPv3 is used (or SNMP is off)</span><span class="result fail">FAIL</span></div><p class="detail">SNMPv1/v2c community strings are used instead of SNMPv3.</p><p class="why">SNMPv3 adds authentication and encryption. SNMPv1/v2c community strings work like plain-text passwords.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>snmp-server group AUDIT v3 priv
+snmp-server user audit AUDIT v3 auth sha &lt;AUTH-PASSWORD&gt; priv aes 128 &lt;PRIV-PASSWORD&gt;</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">SNMP-03</code><span class="title">No read-write SNMP community</span><span class="result fail">FAIL</span></div><p class="detail">Read-write community string(s): public</p><p class="why">A read-write community string lets an attacker change device settings, not just read them.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no snmp-server community &lt;NAME&gt; RW</code></pre></div></article><h3>Services</h3><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">SVC-01</code><span class="title">Plain HTTP server is disabled</span><span class="result fail">FAIL</span></div><p class="detail">The plain HTTP server is enabled (unencrypted management).</p><p class="why">The HTTP server offers an unencrypted management page and has had many vulnerabilities. Disable it unless it is really needed.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no ip http server
+no ip http secure-server</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">SVC-02</code><span class="title">CDP is disabled</span><span class="result fail">FAIL</span></div><p class="detail">CDP is enabled and advertises device details to neighbours.</p><p class="why">CDP tells neighbours the device model, IOS version and management address - useful reconnaissance for an attacker.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no cdp run
+! or per interface:
+interface GigabitEthernet0/1
+ no cdp enable</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">SVC-03</code><span class="title">TCP/UDP small servers are disabled</span><span class="result fail">FAIL</span></div><p class="detail">Small servers are not explicitly disabled: no service tcp-small-servers, no service udp-small-servers</p><p class="why">The small servers (echo, chargen, discard) are old debugging tools. They are rarely needed and can be abused for amplification attacks.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no service tcp-small-servers
+no service udp-small-servers</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">SVC-04</code><span class="title">IP source routing is disabled</span><span class="result fail">FAIL</span></div><p class="detail">IP source routing is enabled, which attackers can abuse.</p><p class="why">Source routing lets the sender choose the path a packet takes. Attackers use it to bypass filters.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no ip source-route</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">SVC-06</code><span class="title">Finger and BOOTP server are disabled</span><span class="result fail">FAIL</span></div><p class="detail">Not disabled: no ip finger, no ip bootp server</p><p class="why">finger reveals who is logged in, and the BOOTP server can be tricked into serving configurations. Neither is normally needed.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>no ip finger
+no ip bootp server</code></pre></div></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">SVC-05</code><span class="title">Directed broadcasts are disabled</span><span class="result pass">PASS</span></div><p class="detail">Directed broadcasts are disabled on all Layer 3 interfaces.</p></article><h3>Logging &amp; NTP</h3><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">LOG-01</code><span class="title">Remote syslog server is configured</span><span class="result fail">FAIL</span></div><p class="detail">No remote syslog server. Logs are lost when the device reboots.</p><p class="why">Local logs disappear on reload and are easy to erase. A remote syslog server keeps evidence and helps with troubleshooting.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>logging host 192.0.2.50
+logging source-interface GigabitEthernet0/0</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">LOG-03</code><span class="title">Syslog trap level is set</span><span class="result fail">FAIL</span></div><p class="detail">&#x27;logging trap&#x27; is missing, so the default level may be too quiet.</p><p class="why">If the trap level is not set, important messages may never be sent to the syslog server.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>logging trap informational</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">NTP-01</code><span class="title">NTP server is configured</span><span class="result fail">FAIL</span></div><p class="detail">No NTP server. Timestamps in logs and certificates will drift.</p><p class="why">Accurate time is essential for log correlation, certificate checks and incident response.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>ntp server 192.0.2.10</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">NTP-02</code><span class="title">NTP authentication is enabled</span><span class="result fail">FAIL</span></div><p class="detail">NTP authentication is incomplete: ntp authenticate, ntp authentication-key, ntp trusted-key</p><p class="why">Without authentication an attacker can feed the device a false time and confuse logs or certificate checks.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>ntp authenticate
+ntp authentication-key 1 md5 &lt;NTP-KEY&gt;
+ntp trusted-key 1
+ntp server 192.0.2.10 key 1</code></pre></div></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">LOG-02</code><span class="title">Buffered logging with timestamps</span><span class="result pass">PASS</span></div><p class="detail">Logs are buffered locally and carry a real date/time.</p></article><h3>Layer 2 security</h3><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-01</code><span class="title">Port security on access ports</span><span class="result fail">FAIL</span></div><p class="detail">Port security is missing on: interface FastEthernet0/1, interface FastEthernet0/2, interface FastEthernet0/3, interface FastEthernet0/10, interface FastEthernet0/11, interface FastEthernet0/12</p><p class="why">Port security limits which MAC addresses may use a port. Without it, anyone can plug in a switch or spoof MAC addresses.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>interface range FastEthernet0/1-8
+ switchport port-security</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-02</code><span class="title">Port security limits and violation mode</span><span class="result fail">FAIL</span></div><p class="detail">Port security needs limits/violation mode on: interface FastEthernet0/1, interface FastEthernet0/2, interface FastEthernet0/3, interface FastEthernet0/10, interface FastEthernet0/11, interface FastEthernet0/12</p><p class="why">Without a maximum and a violation mode, port security may learn unlimited MACs or shut a port too aggressively.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>interface range FastEthernet0/1-8
+ switchport port-security maximum 3
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-03</code><span class="title">Trunk native VLAN is not VLAN 1</span><span class="result fail">FAIL</span></div><p class="detail">Trunks use VLAN 1 (or no explicit native VLAN): interface GigabitEthernet0/1</p><p class="why">VLAN 1 is the default native VLAN on every trunk. Its traffic is untagged, which enables VLAN-hopping attacks.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>interface GigabitEthernet0/1
+ switchport trunk native vlan 99
+! Use a dedicated, unused VLAN as the native VLAN.</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-04</code><span class="title">Unused ports are shut down</span><span class="result fail">FAIL</span></div><p class="detail">Unused ports are still enabled: interface FastEthernet0/10, interface FastEthernet0/11, interface FastEthernet0/12</p><p class="why">An unused port that is up is an open door: anyone can plug in a laptop and get network access.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>interface range FastEthernet0/10-24
+ description UNUSED
+ switchport mode access
+ switchport access vlan 999
+ shutdown</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-05</code><span class="title">DHCP snooping is enabled</span><span class="result fail">FAIL</span></div><p class="detail">DHCP snooping is not enabled; rogue DHCP servers are possible.</p><p class="why">DHCP snooping stops a rogue DHCP server from handing out fake gateways and DNS servers.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>ip dhcp snooping
+ip dhcp snooping vlan 10,20,30
+no ip dhcp snooping information option
+interface GigabitEthernet0/1
+ ip dhcp snooping trust</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-06</code><span class="title">Dynamic ARP Inspection is enabled</span><span class="result fail">FAIL</span></div><p class="detail">Dynamic ARP Inspection is not enabled; ARP spoofing is possible.</p><p class="why">DAI checks ARP packets against the DHCP snooping table, which blocks ARP spoofing and man-in-the-middle attacks.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>ip arp inspection vlan 10,20,30
+ip arp inspection validate src-mac dst-mac ip
+interface GigabitEthernet0/1
+ ip arp inspection trust</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-07</code><span class="title">BPDU Guard is enabled</span><span class="result fail">FAIL</span></div><p class="detail">BPDU Guard is not enabled; rogue switches can break the topology.</p><p class="why">A rogue switch on an access port can become root bridge and capture traffic. BPDU Guard shuts the port instead.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>spanning-tree portfast bpduguard default
+! or per port: spanning-tree bpduguard enable</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">L2-08</code><span class="title">PortFast is enabled on access ports</span><span class="result fail">FAIL</span></div><p class="detail">PortFast is not enabled on access ports.</p><p class="why">PortFast lets access ports forward traffic immediately instead of waiting through STP states. It is safe only with BPDU Guard.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>spanning-tree portfast default</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-09</code><span class="title">Management SVI is not on VLAN 1</span><span class="result fail">FAIL</span></div><p class="detail">The management IP address is on VLAN 1.</p><p class="why">VLAN 1 is the default and is often allowed everywhere. Putting management on a dedicated VLAN makes it harder to reach.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>vlan 99
+ name MGMT
+interface Vlan99
+ ip address 192.0.2.20 255.255.255.0
+ no ip directed-broadcast
+interface Vlan1
+ no ip address
+ shutdown</code></pre></div></article><article class="finding fail"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">L2-10</code><span class="title">Trunk allowed VLAN list is restricted</span><span class="result fail">FAIL</span></div><p class="detail">Trunks allow every VLAN: interface GigabitEthernet0/1</p><p class="why">A trunk that allows every VLAN spreads broadcasts and attacks to the whole network. Allow only the VLANs you actually use.</p><div class="fix"><span class="fix-title">Recommended fix</span><pre><code>interface GigabitEthernet0/1
+ switchport trunk allowed vlan 10,20,30,99</code></pre></div></article></div>
+<div class="card"><div class="device-head"><h2>switch_good.cfg</h2><span class="pill good">100.0% &middot; Good</span></div><p class="meta">File: <code>sample_configs\switch_good.cfg</code> &middot; 34 passed, 0 failed, 0 skipped &middot; score 182/182 points</p><details><summary>Show the analyzed configuration</summary><pre><code>!
+! switch_good.cfg
+! A bonus reference config: the same switch, but properly hardened.
+! All addresses and hashes are fake examples.
+!
+hostname Switch-Good
+!
+banner motd ^C
+**************************************************************
+*  Authorised access only. All activity is monitored/logged. *
+**************************************************************
+^C
+!
+service password-encryption
+service timestamps debug datetime msec localtime
+service timestamps log datetime msec localtime
+no service tcp-small-servers
+no service udp-small-servers
+!
+aaa new-model
+aaa authentication login default group tacacs+ local
+aaa authorization exec default group tacacs+ local
+aaa accounting exec default start-stop group tacacs+
+!
+enable secret 9 $9$EXAMPLEHASHONLY$DoNotUseThisHash
+!
+username admin privilege 15 secret 9 $9$EXAMPLEHASHONLY$AdminHash
+!
+ip ssh version 2
+ip ssh time-out 60
+ip ssh authentication-retries 3
+no ip http server
+no ip http secure-server
+no ip source-route
+no ip finger
+no ip bootp server
+no cdp run
+!
+ip access-list standard MGMT-ACCESS
+ permit 192.0.2.0 0.0.0.255
+!
+snmp-server group AUDIT v3 priv
+snmp-server user audit AUDIT v3 auth sha AuthPass123 priv aes 128 PrivPass123
+snmp-server location DC1-Rack12
+snmp-server contact noc@example.com
+!
+logging host 192.0.2.50
+logging source-interface Vlan99
+logging buffered 16384 informational
+logging trap informational
+!
+ntp authenticate
+ntp authentication-key 1 md5 NtpKey123
+ntp trusted-key 1
+ntp server 192.0.2.10 key 1
+!
+vlan 10
+ name USERS
+vlan 20
+ name VOICE
+vlan 30
+ name SERVERS
+vlan 99
+ name MGMT
+vlan 999
+ name UNUSED
+!
+ip dhcp snooping
+ip dhcp snooping vlan 10,20,30
+no ip dhcp snooping information option
+ip arp inspection vlan 10,20,30
+ip arp inspection validate src-mac dst-mac ip
+!
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+vlan dot1q tag native
+!
+interface Vlan99
+ description MANAGEMENT-SVI
+ ip address 192.0.2.20 255.255.255.0
+ no ip directed-broadcast
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description TRUNK-TO-CORE
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,20,30,99
+ ip dhcp snooping trust
+ ip arp inspection trust
+ no shutdown
+!
+interface FastEthernet0/1
+ description USER-PORT
+ switchport mode access
+ switchport access vlan 10
+ switchport port-security
+ switchport port-security maximum 3
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+!
+interface FastEthernet0/2
+ description USER-PORT
+ switchport mode access
+ switchport access vlan 10
+ switchport port-security
+ switchport port-security maximum 3
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+!
+interface FastEthernet0/3
+ description USER-PORT
+ switchport mode access
+ switchport access vlan 10
+ switchport port-security
+ switchport port-security maximum 3
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+!
+interface FastEthernet0/10
+ description UNUSED - patch panel
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+!
+interface FastEthernet0/11
+ description UNUSED - patch panel
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+!
+interface FastEthernet0/12
+ description SPARE - meeting room
+ switchport mode access
+ switchport access vlan 999
+ shutdown
+!
+line con 0
+ exec-timeout 10 0
+ logging synchronous
+ login local
+!
+line vty 0 4
+ access-class MGMT-ACCESS in
+ exec-timeout 10 0
+ logging synchronous
+ login local
+ transport input ssh
+!
+line vty 5 15
+ access-class MGMT-ACCESS in
+ exec-timeout 10 0
+ logging synchronous
+ login local
+ transport input ssh
+!
+end
+</code></pre></details><h3>Management plane</h3><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">MGMT-01</code><span class="title">Enable secret is configured</span><span class="result pass">PASS</span></div><p class="detail">A hashed enable secret is configured.</p></article><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">MGMT-02</code><span class="title">SSHv2 only, Telnet disabled</span><span class="result pass">PASS</span></div><p class="detail">VTY lines accept SSH only, and SSH version 2 is forced.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-03</code><span class="title">VTY lines have an idle timeout</span><span class="result pass">PASS</span></div><p class="detail">Every VTY line logs out idle sessions.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">MGMT-04</code><span class="title">Console line has an idle timeout</span><span class="result pass">PASS</span></div><p class="detail">The console line logs out idle sessions.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">MGMT-05</code><span class="title">Login banner is configured</span><span class="result pass">PASS</span></div><p class="detail">A login banner is configured.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-06</code><span class="title">AAA authentication is enabled</span><span class="result pass">PASS</span></div><p class="detail">AAA new-model and a default login method are configured.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-07</code><span class="title">Named admin account uses a secret</span><span class="result pass">PASS</span></div><p class="detail">A named admin account uses a hashed secret.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-08</code><span class="title">Service password-encryption is enabled</span><span class="result pass">PASS</span></div><p class="detail">service password-encryption is enabled.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">MGMT-09</code><span class="title">VTY access is restricted by an ACL</span><span class="result pass">PASS</span></div><p class="detail">VTY lines are restricted by an inbound access-class.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">MGMT-10</code><span class="title">SSH timeouts and retries are limited</span><span class="result pass">PASS</span></div><p class="detail">SSH has a timeout and at most three authentication retries.</p></article><h3>SNMP</h3><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">SNMP-01</code><span class="title">No default SNMP community strings</span><span class="result pass">PASS</span></div><p class="detail">No default SNMP community strings are used.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">SNMP-02</code><span class="title">SNMPv3 is used (or SNMP is off)</span><span class="result pass">PASS</span></div><p class="detail">SNMPv3 group and user are configured.</p></article><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">SNMP-03</code><span class="title">No read-write SNMP community</span><span class="result pass">PASS</span></div><p class="detail">No read-write SNMP community string is configured.</p></article><h3>Services</h3><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">SVC-01</code><span class="title">Plain HTTP server is disabled</span><span class="result pass">PASS</span></div><p class="detail">The plain HTTP server is disabled.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">SVC-02</code><span class="title">CDP is disabled</span><span class="result pass">PASS</span></div><p class="detail">CDP is disabled globally.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">SVC-03</code><span class="title">TCP/UDP small servers are disabled</span><span class="result pass">PASS</span></div><p class="detail">TCP and UDP small servers are disabled.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">SVC-04</code><span class="title">IP source routing is disabled</span><span class="result pass">PASS</span></div><p class="detail">IP source routing is disabled.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">SVC-05</code><span class="title">Directed broadcasts are disabled</span><span class="result pass">PASS</span></div><p class="detail">Directed broadcasts are disabled on all Layer 3 interfaces.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">SVC-06</code><span class="title">Finger and BOOTP server are disabled</span><span class="result pass">PASS</span></div><p class="detail">The finger service and the BOOTP server are disabled.</p></article><h3>Logging &amp; NTP</h3><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">LOG-01</code><span class="title">Remote syslog server is configured</span><span class="result pass">PASS</span></div><p class="detail">Logs are sent to a remote syslog server.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">LOG-02</code><span class="title">Buffered logging with timestamps</span><span class="result pass">PASS</span></div><p class="detail">Logs are buffered locally and carry a real date/time.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">LOG-03</code><span class="title">Syslog trap level is set</span><span class="result pass">PASS</span></div><p class="detail">The syslog severity level is set explicitly.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">NTP-01</code><span class="title">NTP server is configured</span><span class="result pass">PASS</span></div><p class="detail">At least one NTP server is configured.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">NTP-02</code><span class="title">NTP authentication is enabled</span><span class="result pass">PASS</span></div><p class="detail">NTP authentication is enabled with a trusted key.</p></article><h3>Layer 2 security</h3><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-01</code><span class="title">Port security on access ports</span><span class="result pass">PASS</span></div><p class="detail">All active access ports have port security.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-02</code><span class="title">Port security limits and violation mode</span><span class="result pass">PASS</span></div><p class="detail">Port security limits MAC addresses and restricts violations.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-03</code><span class="title">Trunk native VLAN is not VLAN 1</span><span class="result pass">PASS</span></div><p class="detail">Every trunk uses a dedicated native VLAN instead of VLAN 1.</p></article><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-04</code><span class="title">Unused ports are shut down</span><span class="result pass">PASS</span></div><p class="detail">All ports marked unused are administratively shut down.</p></article><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-05</code><span class="title">DHCP snooping is enabled</span><span class="result pass">PASS</span></div><p class="detail">DHCP snooping is enabled for at least one VLAN.</p></article><article class="finding pass"><div class="finding-head"><span class="sev high">HIGH</span><code class="cid">L2-06</code><span class="title">Dynamic ARP Inspection is enabled</span><span class="result pass">PASS</span></div><p class="detail">Dynamic ARP Inspection is enabled for at least one VLAN.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-07</code><span class="title">BPDU Guard is enabled</span><span class="result pass">PASS</span></div><p class="detail">BPDU Guard is enabled globally for PortFast ports.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">L2-08</code><span class="title">PortFast is enabled on access ports</span><span class="result pass">PASS</span></div><p class="detail">PortFast is enabled globally.</p></article><article class="finding pass"><div class="finding-head"><span class="sev medium">MEDIUM</span><code class="cid">L2-09</code><span class="title">Management SVI is not on VLAN 1</span><span class="result pass">PASS</span></div><p class="detail">Management is not addressed on VLAN 1.</p></article><article class="finding pass"><div class="finding-head"><span class="sev low">LOW</span><code class="cid">L2-10</code><span class="title">Trunk allowed VLAN list is restricted</span><span class="result pass">PASS</span></div><p class="detail">Every trunk has an explicit allowed VLAN list.</p></article></div>
+<footer>Generated offline by cisco-config-auditor. No data left this computer.</footer>
+</div></body></html>

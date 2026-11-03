@@ -1,0 +1,3 @@
+# The auditor itself uses only the Python standard library, so it runs
+# without installing anything. pytest is needed only to run the tests.
+pytest>=8.0
